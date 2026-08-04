@@ -7,7 +7,7 @@
     "start": "node src/core/index.js"
   },
   "author": "OnyxBot Team",
-  "license": "MIT"
+  "license": "MIT",
   "dependencies": {
   "@whiskeysockets/baileys": "latest"
   }
