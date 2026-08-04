@@ -1,0 +1,10 @@
+{
+  "botName": "OnyxBot",
+  "version": "1.0.0",
+  "motto": "Más que un bot. Un compañero para tu comunidad.",
+  "features": {
+    "ai": true,
+    "moderation": true,
+    "welcome": true
+  }
+}
