@@ -1,0 +1,8 @@
+{
+  "users": [
+    {
+      "id": "OWNER_ID",
+      "role": "owner"
+    }
+  ]
+}
