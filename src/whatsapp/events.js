@@ -1,8 +1,8 @@
 function handleConnectionUpdate(update) {
-  const { connection, lastDisconnect } = update;
+  const { connection, lastDisconnect, qr } = update;
 
-  if (connection === "connecting") {
-    console.log("🟡 OnyxBot conectando a WhatsApp...");
+  if (qr) {
+    console.log("📲 QR generado. Escanéalo con WhatsApp.");
   }
 
   if (connection === "open") {
@@ -11,10 +11,6 @@ function handleConnectionUpdate(update) {
 
   if (connection === "close") {
     console.log("🔴 Conexión cerrada.");
-
-    if (lastDisconnect) {
-      console.log("⚠️ Motivo:", lastDisconnect.error?.message);
-    }
   }
 }
 
