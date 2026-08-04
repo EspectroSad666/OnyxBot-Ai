@@ -1,7 +1,9 @@
 const helpCommand = require("./help");
+const statusCommand = require("./status");
 
 const commands = {
-  ayuda: helpCommand
+  ayuda: helpCommand,
+  estado: statusCommand
 };
 
 function executeCommand(command) {
