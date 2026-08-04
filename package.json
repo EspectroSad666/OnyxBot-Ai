@@ -8,4 +8,7 @@
   },
   "author": "OnyxBot Team",
   "license": "MIT"
+  "dependencies": {
+  "@whiskeysockets/baileys": "latest"
+  }
 }
