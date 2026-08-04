@@ -1,11 +1,14 @@
 const responder = require("../ai/responder");
+const checkMention = require("./mention");
 
 function handleMessage(message) {
   console.log("📩 Mensaje recibido:", message);
 
-  const respuesta = responder(message);
+  if (checkMention(message)) {
+    const respuesta = responder(message);
 
-  console.log("💬 Respuesta de OnyxBot:", respuesta);
+    console.log("💬 OnyxBot responde:", respuesta);
+  }
 }
 
 module.exports = handleMessage;
