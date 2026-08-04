@@ -2,6 +2,7 @@ const { default: makeWASocket, useMultiFileAuthState } = require("@whiskeysocket
 const handleConnectionUpdate = require("./events");
 const startReceiver = require("./receiver");
 const pino = require("pino");
+const qrcode = require("qrcode-terminal");
 
 async function connectWhatsApp() {
   console.log("📱 Preparando conexión con WhatsApp...");
@@ -15,8 +16,13 @@ async function connectWhatsApp() {
 
   sock.ev.on("creds.update", saveCreds);
 
-  sock.ev.on("connection.update", handleConnectionUpdate);
+  sock.ev.on("connection.update", (update) => {
+  if (update.qr) {
+    qrcode.generate(update.qr, { small: true });
+  }
 
+  handleConnectionUpdate(update);
+});
   startReceiver(sock);
 
   return sock;
