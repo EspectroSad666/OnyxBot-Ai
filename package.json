@@ -2,13 +2,13 @@
   "name": "onyxbot-ai",
   "version": "1.0.0",
   "description": "Más que un bot. Un compañero para tu comunidad.",
-  "main": "src/core/index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node src/core/index.js"
+    "start": "node src/index.js"
   },
   "author": "OnyxBot Team",
   "license": "MIT",
   "dependencies": {
-  "@whiskeysockets/baileys": "latest"
+    "@whiskeysockets/baileys": "latest"
   }
 }
