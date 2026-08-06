@@ -35,7 +35,7 @@ async function connectWhatsApp() {
   }
     console.log("══════════════════════════════");
     console.log("📱 Código de vinculación:");
-    console.log(`🔑 ${codigo}`);
+    console.log(`🔑 ${code}`);
     console.log("══════════════════════════════");
     console.log("");
   }
