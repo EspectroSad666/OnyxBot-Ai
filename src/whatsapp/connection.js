@@ -1,6 +1,7 @@
 const {
   default: makeWASocket,
   useMultiFileAuthState,
+  fetchLatestBaileysVersion,
   Browsers
 } = require("@whiskeysockets/baileys");
 
@@ -9,8 +10,6 @@ const pino = require("pino");
 const handleConnectionUpdate = require("./events");
 const startReceiver = require("./receiver");
 
-// Estados Unidos: 1 + los 10 dígitos.
-// Sin +, espacios, guiones ni paréntesis.
 const PHONE_NUMBER = "14029867586";
 
 let pairingCodeRequested = false;
@@ -21,27 +20,36 @@ async function connectWhatsApp() {
   const { state, saveCreds } =
     await useMultiFileAuthState("./database/auth");
 
+  const { version } = await fetchLatestBaileysVersion();
+
   const sock = makeWASocket({
+    version,
     auth: state,
     logger: pino({ level: "silent" }),
-    browser: Browsers.macOS("Google Chrome")
+    browser: Browsers.macOS("Chrome")
   });
 
   sock.ev.on("creds.update", saveCreds);
 
   sock.ev.on("connection.update", async (update) => {
-    const { qr } = update;
+    const { connection, qr } = update;
+
+    handleConnectionUpdate(update);
+
+    const readyForPairing =
+      connection === "connecting" || Boolean(qr);
 
     if (
-      qr &&
+      readyForPairing &&
       !state.creds.registered &&
       !pairingCodeRequested
     ) {
       pairingCodeRequested = true;
 
       try {
-        const code =
-          await sock.requestPairingCode(PHONE_NUMBER);
+        const code = await sock.requestPairingCode(
+          PHONE_NUMBER
+        );
 
         console.log("");
         console.log("══════════════════════════════");
@@ -58,8 +66,6 @@ async function connectWhatsApp() {
         );
       }
     }
-
-    handleConnectionUpdate(update);
   });
 
   startReceiver(sock);
