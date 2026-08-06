@@ -1,8 +1,8 @@
 const {
   default: makeWASocket,
   useMultiFileAuthState,
-  fetchLatestBaileysVersion,
-  Browsers
+  Browsers,
+  delay
 } = require("@whiskeysockets/baileys");
 
 const pino = require("pino");
@@ -10,9 +10,9 @@ const pino = require("pino");
 const handleConnectionUpdate = require("./events");
 const startReceiver = require("./receiver");
 
+// Estados Unidos: 1 + código de área + número.
+// Sin +, espacios, guiones ni paréntesis.
 const PHONE_NUMBER = "14029867586";
-
-let pairingCodeRequested = false;
 
 async function connectWhatsApp() {
   console.log("📱 Preparando conexión con WhatsApp...");
@@ -20,55 +20,41 @@ async function connectWhatsApp() {
   const { state, saveCreds } =
     await useMultiFileAuthState("./database/auth");
 
-  const { version } = await fetchLatestBaileysVersion();
-
   const sock = makeWASocket({
-    version,
     auth: state,
     logger: pino({ level: "silent" }),
-    browser: Browsers.macOS("Chrome")
+    browser: Browsers.macOS("Google Chrome"),
+    markOnlineOnConnect: false,
+    syncFullHistory: false
   });
 
   sock.ev.on("creds.update", saveCreds);
-
-  sock.ev.on("connection.update", async (update) => {
-    const { connection, qr } = update;
-
-    handleConnectionUpdate(update);
-
-    const readyForPairing =
-      connection === "connecting" || Boolean(qr);
-
-    if (
-      readyForPairing &&
-      !state.creds.registered &&
-      !pairingCodeRequested
-    ) {
-      pairingCodeRequested = true;
-
-      try {
-        const code = await sock.requestPairingCode(
-          PHONE_NUMBER
-        );
-
-        console.log("");
-        console.log("══════════════════════════════");
-        console.log("📱 Código de vinculación:");
-        console.log(`🔑 ${code}`);
-        console.log("══════════════════════════════");
-        console.log("");
-      } catch (error) {
-        pairingCodeRequested = false;
-
-        console.log(
-          "❌ No se pudo generar el código:",
-          error.message
-        );
-      }
-    }
-  });
+  sock.ev.on("connection.update", handleConnectionUpdate);
 
   startReceiver(sock);
+
+  if (!state.creds.registered) {
+    console.log("⏳ Esperando que WhatsApp prepare la conexión...");
+
+    // Evita el error 428 / Connection Closed.
+    await delay(5000);
+
+    try {
+      const code = await sock.requestPairingCode(PHONE_NUMBER);
+
+      console.log("");
+      console.log("══════════════════════════════");
+      console.log("📱 Código de vinculación:");
+      console.log(`🔑 ${code}`);
+      console.log("══════════════════════════════");
+      console.log("");
+    } catch (error) {
+      console.log(
+        "❌ No se pudo generar el código:",
+        error?.message || error
+      );
+    }
+  }
 
   return sock;
 }
