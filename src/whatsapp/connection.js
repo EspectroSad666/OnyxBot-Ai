@@ -27,7 +27,7 @@ async function connectWhatsApp() {
 
       const code = await sock.requestPairingCode(phoneNumber);
 
-      console.log("📲 Código de vinculación:", code);
+      console.log(`📲 Código de vinculación: ${codigo}`);
     } catch (error) {
       console.log("❌ Error generando código:", error.message);
     }
