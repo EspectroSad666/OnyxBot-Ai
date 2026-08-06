@@ -20,11 +20,19 @@ async function connectWhatsApp() {
   sock.ev.on("creds.update", saveCreds);
   sock.ev.on("connection.update", handleConnectionUpdate);
 
-  if (!sock.authState.creds.registered) {
-    const numero = "14029867586";
-    const codigo = await sock.requestPairingCode(numero);
+  if (!state.creds.registered) {
+  setTimeout(async () => {
+    try {
+      const phoneNumber = "14029867586";
 
-    console.log("");
+      const code = await sock.requestPairingCode(phoneNumber);
+
+      console.log("📲 Código de vinculación:", code);
+    } catch (error) {
+      console.log("❌ Error generando código:", error.message);
+    }
+  }, 5000);
+  }
     console.log("══════════════════════════════");
     console.log("📱 Código de vinculación:");
     console.log(`🔑 ${codigo}`);
