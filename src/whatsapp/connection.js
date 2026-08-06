@@ -10,8 +10,8 @@ const pino = require("pino");
 const handleConnectionUpdate = require("./events");
 const startReceiver = require("./receiver");
 
-// Estados Unidos: 1 + código de área + número.
-// Sin +, espacios, guiones ni paréntesis.
+// Déjalo con el mismo número que ya verificaste.
+// Solo dígitos, sin +, espacios ni guiones.
 const PHONE_NUMBER = "14029867586";
 
 async function connectWhatsApp() {
@@ -23,9 +23,12 @@ async function connectWhatsApp() {
   const sock = makeWASocket({
     auth: state,
     logger: pino({ level: "silent" }),
-    browser: Browsers.macOS("Google Chrome"),
-    markOnlineOnConnect: false,
-    syncFullHistory: false
+
+    // Este es el cambio importante.
+    browser: Browsers.ubuntu("Chrome"),
+
+    syncFullHistory: false,
+    markOnlineOnConnect: false
   });
 
   sock.ev.on("creds.update", saveCreds);
@@ -34,10 +37,9 @@ async function connectWhatsApp() {
   startReceiver(sock);
 
   if (!state.creds.registered) {
-    console.log("⏳ Esperando que WhatsApp prepare la conexión...");
+    console.log("⏳ Preparando código de vinculación...");
 
-    // Evita el error 428 / Connection Closed.
-    await delay(5000);
+    await delay(3000);
 
     try {
       const code = await sock.requestPairingCode(PHONE_NUMBER);
